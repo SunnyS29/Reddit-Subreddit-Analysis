@@ -3,7 +3,7 @@
 
 I wanted to know if the rise of AI coding tools actually changed how developers use Reddit, and whether communities like `r/learnprogramming` slowed down as newer AI-focused spaces took off.
 
-This project collects, cleans, and analyses post-level data across six subreddits to find out.
+This project collects, cleans, and analyses post-level data across eight subreddits to find out.
 
 ---
 
@@ -13,6 +13,8 @@ This project collects, cleans, and analyses post-level data across six subreddit
 - `r/learnprogramming` - traditional learning community
 - `r/cscareerquestions` - career sentiment indicator
 - `r/vibecoding` - AI-assisted, new wave
+- `r/ChatGPT` - general AI adoption signal
+- `r/ClaudeAI` - parallel general AI assistant community
 - `r/Codex` - coding assistant community
 - `r/ClaudeCode` - alternative AI coding assistant community
 
@@ -20,14 +22,18 @@ This project collects, cleans, and analyses post-level data across six subreddit
 
 ## What the pipeline does
 
-Pulls posts from each subreddit, cleans and combines them, then exports summary CSVs ready for Tableau.
+Pulls posts from each subreddit, cleans and combines them, then exports summary CSVs ready for Tableau. The analysis tracks beginner-style posts, separates general AI from developer AI communities, and includes AI milestone dates for chart reference lines.
 
 ```text
 data/raw/<subreddit>.csv          raw post-level data per subreddit
 data/clean/reddit_analysis.csv    cleaned combined dataset
 data/clean/growth_by_month.csv    post volume by subreddit and month
+data/clean/beginner_activity_by_month.csv beginner-style post volume over time
 data/clean/engagement_summary.csv subreddit engagement metrics
+data/clean/engagement_pre_post_chatgpt.csv engagement before vs after Nov 2022
 data/clean/sentiment_by_month.csv sentiment trends over time (optional)
+data/clean/ai_reference_dates.csv key AI dates for Tableau reference lines
+data/clean/subreddit_metadata.csv subreddit roles and AI-track labels
 outputs/cleaning_report.md        documented cleaning decisions
 ```
 
@@ -71,8 +77,6 @@ python3 scripts/analyze_reddit_data.py --with-sentiment
 
 Code and environment are ready. Waiting on Reddit API credentials before live collection can run.
 
-In the meantime, a dataset with the same column structure can be dropped into `data/raw/` to run the rest of the pipeline.
-
 ---
 
 ## Project structure
@@ -88,8 +92,6 @@ In the meantime, a dataset with the same column structure can be dropped into `d
 |   |-- clean_reddit_data.py
 |   |-- analyze_reddit_data.py
 |   `-- run_pipeline.py
-|-- docs/
-|   `-- HANDOFF.md
 |-- .env.example
 |-- Makefile
 `-- requirements.txt

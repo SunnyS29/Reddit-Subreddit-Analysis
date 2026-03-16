@@ -15,6 +15,8 @@ DEFAULT_SUBREDDITS = [
     "learnprogramming",
     "cscareerquestions",
     "vibecoding",
+    "ChatGPT",
+    "ClaudeAI",
     "Codex",
     "ClaudeCode",
 ]

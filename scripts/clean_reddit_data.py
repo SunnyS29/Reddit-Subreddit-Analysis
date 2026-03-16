@@ -8,6 +8,10 @@ import pandas as pd
 RAW_DATA_DIR = Path("data/raw")
 CLEAN_DATA_DIR = Path("data/clean")
 OUTPUTS_DIR = Path("outputs")
+OPTIONAL_COLUMNS_DEFAULTS = {
+    "time_filter": pd.NA,
+    "collected_at_utc": pd.NA,
+}
 
 
 def load_raw_data() -> pd.DataFrame:
@@ -18,7 +22,16 @@ def load_raw_data() -> pd.DataFrame:
     return pd.concat((pd.read_csv(path) for path in csv_files), ignore_index=True)
 
 
+def ensure_optional_columns(df: pd.DataFrame) -> pd.DataFrame:
+    df = df.copy()
+    for column, default_value in OPTIONAL_COLUMNS_DEFAULTS.items():
+        if column not in df.columns:
+            df[column] = default_value
+    return df
+
+
 def clean_dataframe(df: pd.DataFrame) -> tuple[pd.DataFrame, dict[str, int]]:
+    df = ensure_optional_columns(df)
     metrics = {
         "rows_loaded": int(len(df)),
     }
@@ -41,6 +54,7 @@ def clean_dataframe(df: pd.DataFrame) -> tuple[pd.DataFrame, dict[str, int]]:
     df["subscriber_count"] = pd.to_numeric(
         df["subscriber_count"], errors="coerce"
     ).fillna(0)
+    df["collected_at_utc"] = df["collected_at_utc"].astype("string")
 
     critical_missing_mask = (
         df["post_id"].isna()
@@ -62,7 +76,7 @@ def clean_dataframe(df: pd.DataFrame) -> tuple[pd.DataFrame, dict[str, int]]:
     df = df.loc[~duplicate_mask].copy()
 
     df["created_at"] = pd.to_datetime(df["created_utc"], unit="s", utc=True)
-    df["month"] = df["created_at"].dt.to_period("M").astype("string")
+    df["month"] = df["created_at"].dt.strftime("%Y-%m")
     df["engagement_ratio"] = df["num_comments"] / (df["score"] + 1)
 
     score_threshold = df["score"].mean() + (3 * df["score"].std(ddof=0))
